@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Duvar Kağıdı Kataloğu | Hazar Dekorasyon</title>
+  <meta name="description" content="Hazar Dekorasyon duvar kağıdı kataloğu: damask, botanik, geometrik, mermer, keten doku, çocuk odası ve panoramik duvar kağıtları. Renge, mekâna ve stile göre filtreleyin." />
+  <meta name="theme-color" content="#f7f2eb" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/katalog.css" />
+</head>
+<body class="is-loading page-katalog">
+
+  <div class="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <svg class="preloader__mark" viewBox="0 0 60 72"><path d="M6 70 V30 A24 24 0 0 1 54 30 V70" /></svg>
+      <div class="preloader__word">HAZAR</div>
+    </div>
+  </div>
+
+  <header class="header" data-header>
+    <div class="container header__inner">
+      <a href="index.html" class="logo" aria-label="Hazar Dekorasyon ana sayfa">
+        <svg class="logo__mark" viewBox="0 0 44 52" aria-hidden="true"><path d="M4 51 V22 A18 18 0 0 1 40 22 V51" /><text x="22" y="42" text-anchor="middle">H</text></svg>
+        <span class="logo__text"><b>HAZAR</b><small>DEKORASYON</small></span>
+      </a>
+      <nav class="nav" data-nav>
+        <a href="index.html#hizmetler">Hizmetler</a>
+        <a href="katalog.html" class="is-active">Katalog</a>
+        <a href="index.html#odanda-gor">Odanda Gör</a>
+        <a href="index.html#projeler">Projeler</a>
+        <a href="index.html#surec">Süreç</a>
+        <a href="index.html#iletisim">İletişim</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" data-fav-open aria-label="Favorilerim">
+          <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+          <span class="icon-btn__count" data-fav-count>0</span>
+        </button>
+        <a href="tel:+905432038730" class="btn btn--dark btn--sm header__cta">
+          <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+          Hemen Ara
+        </a>
+        <button class="burger" data-burger aria-label="Menüyü aç"><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Sayfa başlığı -->
+    <section class="khero">
+      <div class="khero__pattern" data-khero-pattern aria-hidden="true"></div>
+      <div class="container khero__inner">
+        <nav class="crumbs" aria-label="Sayfa yolu"><a href="index.html">Ana Sayfa</a><span>/</span><b>Katalog</b></nav>
+        <h1 class="khero__title">Duvar Kağıdı <em>Kataloğu</em></h1>
+        <p class="lead">Klasik damasklardan doğal keten dokulara, çocuk odası desenlerinden panoramik duvar resimlerine… Renge, mekâna ve stile göre filtreleyin; beğendiklerinizi favorilere ekleyip tek tıkla bize gönderin.</p>
+        <div class="kcats" data-kcats></div>
+      </div>
+    </section>
+
+    <!-- Araç çubuğu -->
+    <div class="ktool" data-ktool>
+      <div class="container ktool__inner">
+        <button class="ktool__filter-btn" data-open-filters>
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filtrele<span data-filter-count></span>
+        </button>
+        <label class="ksearch">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Desen, koleksiyon veya kod ara (ör. damask, HZ-1021)" data-search />
+        </label>
+        <div class="ktool__right">
+          <span class="kcount"><b data-count-num>0</b> desen</span>
+          <label class="kselect">
+            <span>Sırala</span>
+            <select data-sort>
+              <option value="onerilen">Önerilen</option>
+              <option value="yeni">Yeni gelenler</option>
+              <option value="az">İsim (A–Z)</option>
+              <option value="za">İsim (Z–A)</option>
+            </select>
+          </label>
+          <div class="kview" role="group" aria-label="Görünüm">
+            <button class="is-active" data-cols="4" aria-label="Sık görünüm"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
+            <button data-cols="3" aria-label="Geniş görünüm"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="8"/><rect x="3" y="14" width="18" height="7"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="kbody">
+      <div class="container kbody__grid">
+        <!-- Filtreler -->
+        <aside class="kfilters" data-filters>
+          <div class="kfilters__head">
+            <h3>Filtreler</h3>
+            <button class="pmodal__close" style="position:static;box-shadow:none" data-close-filters aria-label="Kapat"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          </div>
+          <div class="kfilters__scroll">
+            <div class="fgroup">
+              <h4>Renk Tonu</h4>
+              <div class="ftones" data-f-tones></div>
+            </div>
+            <div class="fgroup">
+              <h4>Mekân</h4>
+              <div class="flist" data-f-rooms></div>
+            </div>
+            <div class="fgroup">
+              <h4>Materyal</h4>
+              <div class="flist" data-f-materials></div>
+            </div>
+            <div class="fgroup">
+              <h4>Öne Çıkanlar</h4>
+              <div class="flist" data-f-flags></div>
+            </div>
+          </div>
+          <div class="kfilters__foot">
+            <button class="btn btn--ghost btn--sm" data-clear>Temizle</button>
+            <button class="btn btn--dark btn--sm" data-close-filters>Sonuçları Gör (<span data-count-num>0</span>)</button>
+          </div>
+        </aside>
+        <div class="kfilters__backdrop" data-close-filters></div>
+
+        <!-- Ürünler -->
+        <div class="kresults">
+          <div class="kactive" data-active></div>
+          <div class="kgrid" data-grid></div>
+          <div class="kempty" data-empty hidden>
+            <svg viewBox="0 0 64 64"><rect x="10" y="8" width="44" height="48" rx="4"/><path d="M10 20h44M22 32h20M22 40h12"/></svg>
+            <h3>Bu kriterlere uygun desen bulunamadı</h3>
+            <p>Filtreleri azaltmayı deneyin ya da aradığınız deseni bize sorun; numune kataloglarımızda yüzlerce seçenek daha var.</p>
+            <button class="btn btn--dark" data-clear>Filtreleri Temizle</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alt çağrı -->
+    <section class="kcta">
+      <div class="container kcta__inner">
+        <div class="kcta__swatches" data-kcta-swatches aria-hidden="true"></div>
+        <div class="kcta__text">
+          <p class="eyebrow light">Numune Kataloğu</p>
+          <h2 class="h2 light">Desenleri <em>elinizle</em> dokunarak seçin.</h2>
+          <p>Ücretsiz keşif randevusunda numune kataloglarımızı da yanımızda getiriyoruz. Dokuyu, rengi ve ışığı kendi mekânınızda görün.</p>
+          <div class="kcta__btns">
+            <a href="https://wa.me/905432038730?text=Merhaba%2C%20numune%20katalo%C4%9Fu%20ile%20%C3%BCcretsiz%20ke%C5%9Fif%20randevusu%20almak%20istiyorum." target="_blank" rel="noopener" class="btn btn--light btn--lg">Randevu Al</a>
+            <a href="tel:+905432038730" class="btn btn--ghost btn--lg kcta__ghost">0 543 203 87 30</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <a href="index.html" class="logo logo--light">
+          <svg class="logo__mark" viewBox="0 0 44 52" aria-hidden="true"><path d="M4 51 V22 A18 18 0 0 1 40 22 V51" /><text x="22" y="42" text-anchor="middle">H</text></svg>
+          <span class="logo__text"><b>HAZAR</b><small>DEKORASYON</small></span>
+        </a>
+        <p>Duvar kağıdı, gergi tavan ve anahtar teslim dekorasyon uygulamalarında güvenilir çözüm ortağınız.</p>
+      </div>
+      <div>
+        <h4>Hizmetler</h4>
+        <a href="katalog.html">Duvar Kağıdı</a><a href="index.html#hizmetler">Gergi Tavan</a><a href="index.html#hizmetler">Anahtar Teslim İş</a><a href="index.html#odanda-gor">Odanda Gör</a>
+      </div>
+      <div>
+        <h4>Katalog</h4>
+        <a href="katalog.html?kategori=klasik">Damask & Klasik</a><a href="katalog.html?kategori=botanik">Botanik & Çiçek</a><a href="katalog.html?kategori=geometrik">Geometrik</a><a href="katalog.html?kategori=cocuk">Çocuk Odası</a>
+      </div>
+      <div>
+        <h4>İletişim</h4>
+        <a href="tel:+905432038730">0 543 203 87 30</a><a href="https://wa.me/905432038730" target="_blank" rel="noopener">WhatsApp</a><a href="https://www.instagram.com/hazardekorasyon/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <span>© <span data-year></span> Hazar Dekorasyon. Tüm hakları saklıdır.</span>
+      <a href="#" data-to-top>Yukarı çık ↑</a>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/905432038730?text=Merhaba%2C%20katalo%C4%9Funuz%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." class="wa-float" target="_blank" rel="noopener" aria-label="WhatsApp ile yazın">
+    <svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.6 10.6 0 1 1 16 26.6zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.8.8a3.3 3.3 0 0 0 2.2-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.6-.4z"/></svg>
+  </a>
+
+  <script src="assets/js/patterns.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/katalog.js"></script>
+</body>
+</html>

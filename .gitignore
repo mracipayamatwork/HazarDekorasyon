@@ -134,3 +134,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Hazar Dekorasyon
+.claude/
+_site/
+Thumbs.db
