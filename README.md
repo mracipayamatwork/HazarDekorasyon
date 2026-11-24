@@ -1,63 +1,92 @@
-# Hazar Dekorasyon — Tanıtım Sitesi
+# Hazar Dekorasyon — Web Sitesi
 
-Sadece frontend (HTML + CSS + JavaScript). Kurulum veya derleme gerekmez.
+ASP.NET Core 9 (Razor Pages) + Entity Framework Core. Geliştirmede **SQLite**, yayında **SQL Server** kullanılacak şekilde hazırlanmıştır.
 
-## Çalıştırma
+## Özellikler
 
-`index.html` dosyasına çift tıklayarak açabilirsiniz. Yerel sunucu ile açmak için:
+- **Site:** Ana sayfa, duvar kağıdı kataloğu (filtre, arama, favoriler, ürün detayı, "Odada Gör", rulo hesabı) ve **fiyat hesaplama** sayfası (`/fiyat-hesapla`).
+- **Yönetim paneli (`/Admin`):**
+  - Ürünler: ekle, düzenle, kopyala, yayından kaldır, sil. Desen motoruyla canlı önizleme veya fotoğraf yükleme.
+  - Kategoriler, renk tonları, mekânlar.
+  - Fiyat listesi: hizmet fiyatlarını tek ekranda güncelleme, toplu yüzde artış/indirim, hizmet ve seçenek ekleme.
+  - Site ayarları: telefon, WhatsApp, Instagram, adres, çalışma saatleri, duyuru şeridi, KDV, minimum iş bedeli, rulo işçiliği.
+  - Şifre değiştirme. Giriş denemeleri IP başına sınırlıdır.
+
+## Kurulum ve çalıştırma
+
+Gereken: [.NET 9 SDK](https://dotnet.microsoft.com/download)
+
+1. Admin hesabı için yerel ayar dosyası oluşturun. Bu dosya git'e eklenmez:
+
+   ```
+   copy src\HazarDekorasyon.Web\appsettings.Local.example.json src\HazarDekorasyon.Web\appsettings.Local.json
+   ```
+
+   Ardından `appsettings.Local.json` içindeki kullanıcı adı ve şifreyi değiştirin.
+
+2. Çalıştırın:
+
+   ```
+   dotnet run --project src/HazarDekorasyon.Web
+   ```
+
+İlk çalıştırmada veritabanı (`src/HazarDekorasyon.Web/App_Data/hazar.db`) otomatik oluşturulur. Örnek katalog (74 ürün), örnek fiyat listesi ve admin hesabı da otomatik yüklenir. Admin hesabı yalnızca veritabanında hiç admin yokken oluşturulur; sonraki şifre değişiklikleri panelden yapılır.
+
+## Proje yapısı
 
 ```
-python -m http.server 5173
+src/HazarDekorasyon.Web/
+  Models/Entities.cs        Veri modelleri (Ürün, Kategori, Ton, Mekân, Fiyat hizmeti/seçeneği, Ayar, Admin)
+  Data/AppDbContext.cs      EF Core bağlamı
+  Data/SeedData.cs          İlk açılışta yüklenen örnek veri
+  Data/Migrations/          Veritabanı şeması (SQLite)
+  Services/                 Ayarlar, katalog JSON'u, görsel yükleme, ondalık sayı bağlayıcı
+  Pages/                    Site sayfaları (Index, Katalog, FiyatHesapla)
+  Pages/Admin/              Yönetim paneli
+  wwwroot/assets/           CSS, JS (desen motoru: patterns.js)
 ```
 
-Ardından tarayıcıda `http://localhost:5173` adresini açın.
+## SQL Server'a geçiş (yayından önce)
 
-## Yayınlama (GitHub Pages + Actions)
+Henüz canlı veri olmadığı için en temiz yol, SQL Server için yeni bir başlangıç migration'ı üretmektir.
 
-`.github/workflows/deploy.yml`, `main` dalına yapılan her gönderimde siteyi otomatik yayınlar.
+1. `appsettings.json` (veya sunucudaki ortam değişkenleri) içinde:
 
-1. GitHub'da depoyu açın, **Settings → Pages → Build and deployment → Source** alanını **GitHub Actions** yapın.
-2. Kodu `main` dalına gönderin (`git push`).
-3. **Actions** sekmesinde iş akışı bitince site `https://<kullanıcı-adı>.github.io/<depo-adı>/` adresinde yayında olur.
+   ```json
+   "Database": { "Provider": "SqlServer" },
+   "ConnectionStrings": { "SqlServer": "Server=...;Database=HazarDekorasyon;User Id=...;Password=...;TrustServerCertificate=True" }
+   ```
 
-## Sayfalar
+   Ortam değişkeniyle: `Database__Provider=SqlServer`, `ConnectionStrings__SqlServer=...`
 
-| Dosya | İçerik |
-|---|---|
-| `index.html` | Ana sayfa: hero, renkler, hizmetler, **Odanda Gör** (önce/sonra), koleksiyonlar, çok satanlar, süreç, galeri, yorumlar, Instagram, iletişim |
-| `katalog.html` | Duvar kağıdı kataloğu: kategori, renk, mekân, materyal filtreleri, arama, sıralama, favoriler, ürün detayı, rulo hesaplayıcı |
+2. SQLite migration'larını silip SQL Server için yeniden oluşturun:
 
-## Klasör yapısı
+   ```
+   rmdir /s /q src\HazarDekorasyon.Web\Data\Migrations
+   dotnet tool restore
+   dotnet dotnet-ef migrations add InitialCreate -p src/HazarDekorasyon.Web -o Data/Migrations
+   ```
 
-```
-assets/
-  css/style.css      Ortak stiller (renkler, tipografi, bileşenler)
-  css/katalog.css    Katalog sayfasına özel stiller
-  js/patterns.js     Duvar kağıdı desenlerini SVG olarak üreten motor
-  js/data.js         Katalog verisi (ürünler, renk tonları, kategoriler)
-  js/main.js         Ortak bileşenler (menü, modal, favoriler, Odanda Gör)
-  js/home.js         Ana sayfa etkileşimleri
-  js/katalog.js      Katalog filtreleme ve arama
-```
+   `dotnet-ef` komutu, migration üretirken de `Database:Provider` ayarına göre SQL Server'ı kullanır.
 
-## Katalog nasıl güncellenir?
+3. Uygulama ilk açılışta tabloları oluşturur ve örnek veriyi yükler.
 
-`assets/js/data.js` dosyasında:
+SQLite'ta panelden girdiğiniz veriyi taşımak isterseniz, migration'ı üretmeden önce haber verin; basit bir aktarım betiği yazılabilir.
 
-- **Desenli ürün eklemek:** `COLLECTIONS` listesindeki bir koleksiyona yeni renk satırı ekleyin
-  (`['Varyant adı', 'ton', '#arkaplan', '#desen', '#vurgu']`).
-- **Fotoğraflı ürün eklemek:** `PHOTO_ITEMS` listesine satır ekleyin. Şimdilik Unsplash görsel kimliği kullanılıyor.
-  Kendi ürün fotoğraflarınızı `assets/img/` klasörüne koyup `data.js` içindeki `IMG` fonksiyonunu
-  buna göre düzenleyebilirsiniz.
+## Yayınlama
 
-## Backend gerektirmeyen çözümler
+GitHub Pages yalnızca statik dosya sunduğu için bu .NET uygulamasını çalıştıramaz. Yayın için ASP.NET Core destekleyen bir sunucu gerekir: Windows hosting (Plesk/IIS), Azure App Service veya bir VPS.
 
-- İletişim formu → bilgileri WhatsApp mesajı olarak hazırlar (`wa.me`).
-- Favoriler → tarayıcının `localStorage` alanında saklanır, listeyi WhatsApp'tan gönderme butonu vardır.
-- Fiyat sorma → her üründe ürün koduyla hazır WhatsApp mesajı.
+`.github/workflows/build.yml` her gönderimde projeyi derler ve yayına hazır paketi Actions sekmesinde **hazar-dekorasyon-web** adıyla saklar. Bu paket sunucuya yüklenebilir.
 
-## Yayına almadan önce güncellenecekler
+Yayında dikkat edilecekler:
 
-- `index.html` içindeki rakamlar (500+ proje, 10+ yıl), müşteri yorumları ve çalışma saatleri **örnek** içeriktir.
-- Galeri, hizmet ve Instagram görselleri Unsplash'ten alınmış ücretsiz görsellerdir; firmanın kendi iş fotoğraflarıyla değiştirilmesi önerilir.
-- Adres bilgisi eklenmedi (Instagram profilinde yer almıyor).
+- `ASPNETCORE_ENVIRONMENT=Production` olmalı.
+- Admin bilgileri ve bağlantı dizesi ortam değişkeni veya `appsettings.Local.json` ile verilmeli; depoya yazılmamalı.
+- `wwwroot/uploads` klasörü yazılabilir olmalı (panelden yüklenen görseller burada saklanır).
+
+## Yayından önce güncellenecek içerikler
+
+- Ürün ve hizmet fiyatları **örnek** değerlerdir; panelden güncellenmelidir.
+- Ana sayfadaki rakamlar (500+ proje, 10+ yıl) ve müşteri yorumları örnek içeriktir.
+- Galeri ve hizmet görselleri Unsplash'ten alınmıştır; firmanın kendi iş fotoğraflarıyla değiştirilmesi önerilir.

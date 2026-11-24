@@ -1,0 +1,46 @@
+@page
+@model AyarlarModel
+@using HazarDekorasyon.Web.Services
+@{
+    ViewData["Title"] = "Site Ayarları";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Site";
+}
+
+<form method="post" style="display:grid;gap:24px;max-width:1000px">
+  <div asp-validation-summary="All" class="validation-summary-errors"></div>
+  @foreach (var group in SettingKeys.All.GroupBy(d => d.Group))
+  {
+    <div class="card">
+      <div class="card__head"><div><h2>@group.Key</h2></div></div>
+      <div class="form-grid">
+        @foreach (var d in group)
+        {
+          var val = Model.Values.GetValueOrDefault(d.Key) ?? "";
+          var id = "s_" + d.Key;
+          <div class="field @(d.Type == "textarea" || d.Key == SettingKeys.Announcement ? "col-12" : "col-6")">
+            @if (d.Type == "bool")
+            {
+              <span class="field-label">@d.Label</span>
+              <input type="hidden" name="Values[@d.Key]" value="false" />
+              <label class="check" style="height:44px"><input type="checkbox" id="@id" name="Values[@d.Key]" value="true" checked="@(val == "true")" /> Evet</label>
+            }
+            else
+            {
+              <label for="@id">@d.Label</label>
+              @if (d.Type == "textarea")
+              {
+                <textarea id="@id" name="Values[@d.Key]" class="textarea" rows="3">@val</textarea>
+              }
+              else
+              {
+                <input id="@id" name="Values[@d.Key]" value="@val" class="input" inputmode="@(d.Type == "number" ? "decimal" : null)" />
+              }
+            }
+            @if (d.Help != null) { <span class="help">@d.Help</span> }
+          </div>
+        }
+      </div>
+    </div>
+  }
+  <div class="form-actions"><button class="abtn abtn--primary">Ayarları Kaydet</button></div>
+</form>

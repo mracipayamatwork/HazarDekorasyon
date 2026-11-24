@@ -1,0 +1,56 @@
+@page
+@model HazarDekorasyon.Web.Pages.Admin.Kategoriler.IndexModel
+@{
+    ViewData["Title"] = "Kategoriler";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Katalog";
+}
+@section Actions {
+  <a href="/Admin/Kategoriler/Duzenle" class="abtn abtn--primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Yeni Kategori</a>
+}
+
+<div class="card card--flush">
+  <div class="card__head" style="padding-bottom:16px"><div><h2>Katalog kategorileri</h2><p>Sıralama, katalog sayfasındaki ve ana sayfadaki sırayı belirler.</p></div></div>
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead><tr><th>Sıra</th><th></th><th>Kategori</th><th>Kısa ad</th><th class="num">Ürün</th><th>Ana sayfa</th><th>Durum</th><th></th></tr></thead>
+      <tbody>
+        @for (var i = 0; i < Model.Rows.Count; i++)
+        {
+          var r = Model.Rows[i]; var c = r.Category;
+          <tr class="@(c.IsActive ? "" : "is-off")">
+            <td style="width:90px">
+              <form method="post" asp-page-handler="Move" asp-route-id="@c.Id" asp-route-dir="-1" style="display:inline"><button class="icon-action" title="Yukarı" disabled="@(i == 0)"><svg viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></svg></button></form>
+              <form method="post" asp-page-handler="Move" asp-route-id="@c.Id" asp-route-dir="1" style="display:inline"><button class="icon-action" title="Aşağı" disabled="@(i == Model.Rows.Count - 1)"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></form>
+            </td>
+            <td style="width:62px">
+              @if (!string.IsNullOrEmpty(c.CoverImageUrl))
+              {
+                <div class="thumb" style="background-image:url('@c.CoverImageUrl')"></div>
+              }
+              else if (r.Sample != null)
+              {
+                var p = r.Sample;
+                <div class="thumb" data-swatch data-type="@p.PatternType" data-bg="@p.BgColor" data-fg="@p.FgColor" data-ac="@p.AccentColor" data-c3="@p.Color3" data-seed="@p.Seed" data-photo="@p.PhotoUrl" data-scale=".35"></div>
+              }
+              else
+              {
+                <div class="thumb"></div>
+              }
+            </td>
+            <td><b>@c.Name</b><small>@c.Tagline</small></td>
+            <td><code>@c.Slug</code></td>
+            <td class="num"><a href="/Admin/Urunler?kategori=@c.Id" style="color:var(--bordo)">@r.ProductCount</a></td>
+            <td>@(c.ShowOnHome ? "✓" : "")</td>
+            <td><span class="pill @(c.IsActive ? "pill--on" : "pill--off")">@(c.IsActive ? "Aktif" : "Pasif")</span></td>
+            <td class="actions">
+              <a class="icon-action" href="/Admin/Kategoriler/Duzenle/@c.Id" title="Düzenle"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+              <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" data-confirm="“@c.Name” kategorisi silinsin mi?">
+                <button class="icon-action icon-action--danger" title="Sil"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+              </form>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

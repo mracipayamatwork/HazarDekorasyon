@@ -1,0 +1,60 @@
+@page "{id:int?}"
+@model HazarDekorasyon.Web.Pages.Admin.Kategoriler.DuzenleModel
+@{
+    ViewData["Title"] = Model.IsNew ? "Yeni Kategori" : Model.Input.Name;
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / <a href=\"/Admin/Kategoriler\">Kategoriler</a>";
+}
+
+<form method="post" enctype="multipart/form-data" class="card" style="max-width:900px">
+  <div class="form-grid">
+    <div class="field col-6">
+      <label asp-for="Input.Name"></label>
+      <input asp-for="Input.Name" class="input" data-slug-source />
+      <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+    </div>
+    <div class="field col-6">
+      <label asp-for="Input.Slug"></label>
+      <input asp-for="Input.Slug" class="input" data-slug-target />
+      <span class="help">Katalog adresinde kullanılır: /katalog?kategori=<b>kisa-ad</b></span>
+      <span asp-validation-for="Input.Slug" class="field-validation-error"></span>
+    </div>
+    <div class="field col-6">
+      <label asp-for="Input.Tagline"></label>
+      <input asp-for="Input.Tagline" class="input" placeholder="ör. Zamansız şıklık" />
+      <span class="help">Ana sayfadaki koleksiyon kutusunda görünür.</span>
+    </div>
+    <div class="field col-6">
+      <label asp-for="Input.SampleProductId"></label>
+      <select asp-for="Input.SampleProductId" class="select">
+        <option value="">Otomatik (ilk ürün)</option>
+        @foreach (var p in Model.Products) { <option value="@p.Id">@p.Code – @p.Name · @p.Variant</option> }
+      </select>
+      <span class="help">Kapak görseli yoksa bu ürünün deseni kullanılır.</span>
+    </div>
+    <div class="field col-6">
+      <label asp-for="Input.CoverImageUrl"></label>
+      <input asp-for="Input.CoverImageUrl" class="input" placeholder="https://… (isteğe bağlı)" />
+    </div>
+    <div class="field col-6">
+      <label for="Upload">veya kapak görseli yükle</label>
+      <input type="file" id="Upload" name="Upload" accept=".jpg,.jpeg,.png,.webp" class="input" style="padding-top:9px" />
+      @Html.ValidationMessage("Upload", null, new { @class = "field-validation-error" })
+    </div>
+    <div class="field col-4">
+      <label asp-for="Input.SortOrder"></label>
+      <input asp-for="Input.SortOrder" class="input" type="number" />
+    </div>
+    <div class="field col-4">
+      <span class="field-label">Ana sayfa</span>
+      <label class="check" style="height:44px"><input asp-for="Input.ShowOnHome" /> Koleksiyonlar bölümünde göster</label>
+    </div>
+    <div class="field col-4">
+      <span class="field-label">Durum</span>
+      <label class="check" style="height:44px"><input asp-for="Input.IsActive" /> Aktif (sitede görünür)</label>
+    </div>
+  </div>
+  <div class="form-actions" style="margin-top:18px">
+    <a href="/Admin/Kategoriler" class="abtn abtn--ghost">Vazgeç</a>
+    <button class="abtn abtn--primary">Kaydet</button>
+  </div>
+</form>

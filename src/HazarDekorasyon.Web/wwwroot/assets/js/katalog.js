@@ -26,10 +26,10 @@
   searchEl.value = state.q;
 
   /* ---------- Başlık deseni ---------- */
-  applySwatch($('[data-khero-pattern]'), byId('hz1012'), 1.4);
+  const heroP = PRODUCTS.find((p) => p.pattern && p.pattern.type === 'ogee') || PRODUCTS.find((p) => p.pattern);
+  if (heroP) applySwatch($('[data-khero-pattern]'), heroP, 1.4);
 
   /* ---------- Kategori düğmeleri ---------- */
-  const catSamples = { klasik: 'hz1001', geometrik: 'hz1006', botanik: 'hz1017', cizgili: 'hz1029', doku: 'hz1036', mermer: 'hz1043', cocuk: 'hz1051', panoramik: 'hz1069' };
   const kcats = $('[data-kcats]');
   function buildCats() {
     kcats.innerHTML = '';
@@ -43,7 +43,7 @@
       b.className = 'kcat';
       b.dataset.cat = c.id;
       b.innerHTML = `<i></i>${c.name} <small>${PRODUCTS.filter((p) => p.cat === c.id).length}</small>`;
-      const sample = byId(catSamples[c.id]);
+      const sample = byId(c.sample);
       if (sample) applySwatch($('i', b), sample, 0.3);
       kcats.appendChild(b);
     });
@@ -142,9 +142,10 @@
     $$('[data-f-flags] input').forEach((i) => (i.checked = state.flags.has(i.value)));
     // aktif filtre çipleri
     const chips = [];
-    if (state.cat !== 'all') chips.push(['cat', state.cat, CATEGORIES.find((c) => c.id === state.cat).name]);
-    state.tones.forEach((t) => chips.push(['tones', t, TONES.find((x) => x.id === t).name + ' tonlar']));
-    state.rooms.forEach((r) => chips.push(['rooms', r, ROOMS.find((x) => x.id === r).name]));
+    const nm = (list, id) => (list.find((x) => x.id === id) || { name: id }).name;
+    if (state.cat !== 'all') chips.push(['cat', state.cat, nm(CATEGORIES, state.cat)]);
+    state.tones.forEach((t) => chips.push(['tones', t, nm(TONES, t) + ' tonlar']));
+    state.rooms.forEach((r) => chips.push(['rooms', r, nm(ROOMS, r)]));
     state.materials.forEach((m) => chips.push(['materials', m, m]));
     state.flags.forEach((f) => chips.push(['flags', f, FLAGS.find((x) => x.id === f).name]));
     if (state.q) chips.push(['q', state.q, `“${state.q}”`]);
@@ -195,9 +196,10 @@
 
   /* ---------- Alt CTA desenleri ---------- */
   const sw = $('[data-kcta-swatches]');
-  ['hz1002', 'hz1021', 'hz1036', 'hz1009', 'hz1043', 'hz1017', 'hz1012', 'hz1039'].forEach((id) => {
+  const seen = new Set();
+  PRODUCTS.filter((p) => p.pattern && !seen.has(p.name) && seen.add(p.name)).slice(0, 8).forEach((p) => {
     const s = document.createElement('span');
-    applySwatch(s, byId(id), 0.5);
+    applySwatch(s, p, 0.5);
     sw.appendChild(s);
   });
 
@@ -205,7 +207,7 @@
   buildFilters();
   update();
 
-  // ?urun=hz1001 ile doğrudan ürün aç
+  // ?urun=HZ-1001 (ürün kodu) ile doğrudan ürün aç
   const direct = qs.get('urun');
   if (direct) setTimeout(() => window.Hazar.openProduct(direct), 600);
 })();

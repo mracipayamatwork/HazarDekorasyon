@@ -1,0 +1,81 @@
+@page
+@model HazarDekorasyon.Web.Pages.Admin.Urunler.IndexModel
+@{
+    ViewData["Title"] = "Ürünler";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Katalog";
+}
+@section Actions {
+  <a href="/Admin/Urunler/Duzenle" class="abtn abtn--primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Yeni Ürün</a>
+}
+
+<div class="card card--flush">
+  <div class="card__head" style="padding-bottom:18px">
+    <form method="get" class="filterbar" style="width:100%">
+      <input name="q" value="@Model.Q" class="input" placeholder="Kod, ad, koleksiyon ara…" />
+      <select name="kategori" class="select" style="width:200px" onchange="this.form.submit()">
+        <option value="">Tüm kategoriler</option>
+        @foreach (var c in Model.Categories)
+        {
+          <option value="@c.Id" selected="@(Model.Kategori == c.Id)">@c.Name</option>
+        }
+      </select>
+      <select name="durum" class="select" style="width:150px" onchange="this.form.submit()">
+        <option value="">Tüm durumlar</option>
+        <option value="aktif" selected="@(Model.Durum == "aktif")">Yayında</option>
+        <option value="pasif" selected="@(Model.Durum == "pasif")">Yayında değil</option>
+      </select>
+      <label class="check"><input type="checkbox" name="fiyatsiz" value="1" checked="@(Model.Fiyatsiz == 1)" onchange="this.form.submit()" /> Fiyatsız</label>
+      <button class="abtn abtn--ghost">Ara</button>
+      <span class="filterbar__count">@Model.Products.Count / @Model.Total ürün</span>
+    </form>
+  </div>
+  <div class="table-wrap">
+    @if (Model.Products.Count == 0)
+    {
+      <div class="empty">Kriterlere uygun ürün bulunamadı.</div>
+    }
+    else
+    {
+      <table class="tbl">
+        <thead>
+          <tr><th></th><th>Ürün</th><th>Kategori</th><th>Ton</th><th>Materyal</th><th>Rozet</th><th class="num">Fiyat</th><th>Durum</th><th></th></tr>
+        </thead>
+        <tbody>
+          @foreach (var p in Model.Products)
+          {
+            <tr class="@(p.IsActive ? "" : "is-off")">
+              <td style="width:62px"><div class="thumb" data-swatch data-type="@p.PatternType" data-bg="@p.BgColor" data-fg="@p.FgColor" data-ac="@p.AccentColor" data-c3="@p.Color3" data-seed="@p.Seed" data-photo="@p.PhotoUrl" data-scale=".35"></div></td>
+              <td><b>@p.Name</b><small>@p.Variant · @p.Code</small></td>
+              <td>@p.Category?.Name</td>
+              <td>
+                @if (p.Tone != null)
+                {
+                  <span class="swatch-dot" title="@p.Tone.Name"><i style="background:@p.Tone.Color1"></i><i style="background:@p.Tone.Color2"></i></span>
+                }
+              </td>
+              <td><small style="color:inherit">@p.Material</small></td>
+              <td>
+                @if (p.Badge != ProductBadge.None)
+                {
+                  <span class="pill @(p.Badge == ProductBadge.Best ? "pill--best" : "pill--new")">@AdminPageModel.BadgeLabel(p.Badge)</span>
+                }
+              </td>
+              <td class="num">@(p.Price is decimal pr ? pr.ToString("N0") + " ₺" : "—")<small>@(p.IsCustomSize ? "/ m²" : "/ rulo")</small></td>
+              <td>
+                <form method="post" asp-page-handler="Toggle" asp-route-id="@p.Id" asp-route-q="@Model.Q" asp-route-kategori="@Model.Kategori" asp-route-durum="@Model.Durum" asp-route-fiyatsiz="@Model.Fiyatsiz">
+                  <button class="pill @(p.IsActive ? "pill--on" : "pill--off")" style="border:0;cursor:pointer" title="Durumu değiştir">@(p.IsActive ? "Yayında" : "Pasif")</button>
+                </form>
+              </td>
+              <td class="actions">
+                <a class="icon-action" href="/Admin/Urunler/Duzenle/@p.Id" title="Düzenle"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+                <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id" asp-route-q="@Model.Q" asp-route-kategori="@Model.Kategori" data-confirm="@p.Code – @p.Name silinsin mi? Bu işlem geri alınamaz.">
+                  <button class="icon-action icon-action--danger" title="Sil"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+                </form>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

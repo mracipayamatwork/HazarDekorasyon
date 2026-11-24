@@ -1,0 +1,35 @@
+@page
+@model GirisModel
+@{
+    ViewData["Title"] = "Giriş";
+}
+<div class="login">
+  <div class="login__brand">
+    <svg viewBox="0 0 44 52" aria-hidden="true"><path d="M4 51 V22 A18 18 0 0 1 40 22 V51" /><text x="22" y="42" text-anchor="middle">H</text></svg>
+    <b>HAZAR</b>
+    <small>Yönetim Paneli</small>
+  </div>
+  <form method="post">
+    @if (Model.NoAdmin)
+    {
+      <div class="login__err">Henüz admin kullanıcısı yok. <code>appsettings</code> dosyasında <code>Admin:UserName</code> ve <code>Admin:Password</code> değerlerini girip uygulamayı yeniden başlatın.</div>
+    }
+    @if (Model.ErrorMessage != null)
+    {
+      <div class="login__err">@Model.ErrorMessage</div>
+    }
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div class="field">
+      <label asp-for="UserName">Kullanıcı adı</label>
+      <input asp-for="UserName" class="input" autocomplete="username" autofocus />
+      <span asp-validation-for="UserName" class="field-validation-error"></span>
+    </div>
+    <div class="field">
+      <label asp-for="Password">Şifre</label>
+      <input asp-for="Password" class="input" autocomplete="current-password" />
+      <span asp-validation-for="Password" class="field-validation-error"></span>
+    </div>
+    <button class="abtn abtn--primary abtn--block">Giriş Yap</button>
+  </form>
+  <a href="/" class="login__back">← Siteye dön</a>
+</div>

@@ -1,0 +1,26 @@
+@page
+@model SifreModel
+@{
+    ViewData["Title"] = "Şifre Değiştir";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Site";
+}
+
+<form method="post" class="card" style="max-width:520px;display:grid;gap:16px">
+  <div class="field">
+    <label asp-for="Current"></label>
+    <input asp-for="Current" class="input" autocomplete="current-password" />
+    <span asp-validation-for="Current" class="field-validation-error"></span>
+  </div>
+  <div class="field">
+    <label asp-for="New"></label>
+    <input asp-for="New" class="input" autocomplete="new-password" />
+    <span class="help">En az 10 karakter.</span>
+    <span asp-validation-for="New" class="field-validation-error"></span>
+  </div>
+  <div class="field">
+    <label asp-for="Confirm"></label>
+    <input asp-for="Confirm" class="input" autocomplete="new-password" />
+    <span asp-validation-for="Confirm" class="field-validation-error"></span>
+  </div>
+  <div class="form-actions"><button class="abtn abtn--primary">Şifreyi Değiştir</button></div>
+</form>

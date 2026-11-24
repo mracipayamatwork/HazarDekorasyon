@@ -1,0 +1,56 @@
+@page
+@model HazarDekorasyon.Web.Pages.Admin.Mekanlar.IndexModel
+@{
+    ViewData["Title"] = "Mekânlar";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Katalog";
+}
+
+<form method="post" asp-page-handler="Save" class="card" style="max-width:900px">
+  <div class="card__head"><div><h2>@(Model.Editing ? $"“{Model.Input.Name}” düzenle" : "Yeni mekân")</h2><p>Katalogdaki “Mekân” filtresinde ve ürün detayında görünür.</p></div></div>
+  <input type="hidden" asp-for="Input.Id" />
+  <div class="form-grid">
+    <div class="field col-5" style="grid-column:span 5">
+      <label asp-for="Input.Name"></label>
+      <input asp-for="Input.Name" class="input" data-slug-source />
+      <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+    </div>
+    <div class="field col-4">
+      <label asp-for="Input.Slug"></label>
+      <input asp-for="Input.Slug" class="input" data-slug-target />
+      <span asp-validation-for="Input.Slug" class="field-validation-error"></span>
+    </div>
+    <div class="field col-3">
+      <label asp-for="Input.SortOrder"></label>
+      <input asp-for="Input.SortOrder" class="input" type="number" />
+    </div>
+  </div>
+  <div class="form-actions" style="margin-top:16px">
+    @if (Model.Editing) { <a href="/Admin/Mekanlar" class="abtn abtn--ghost">Vazgeç</a> }
+    <button class="abtn abtn--primary">@(Model.Editing ? "Kaydet" : "Ekle")</button>
+  </div>
+</form>
+
+<div class="card card--flush" style="max-width:900px">
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead><tr><th>Mekân</th><th>Kısa ad</th><th class="num">Ürün</th><th class="num">Sıra</th><th></th></tr></thead>
+      <tbody>
+        @foreach (var (r, count) in Model.Rows)
+        {
+          <tr>
+            <td><b>@r.Name</b></td>
+            <td><code>@r.Slug</code></td>
+            <td class="num">@count</td>
+            <td class="num">@r.SortOrder</td>
+            <td class="actions">
+              <a class="icon-action" href="/Admin/Mekanlar?duzenle=@r.Id" title="Düzenle"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+              <form method="post" asp-page-handler="Delete" asp-route-id="@r.Id" data-confirm="“@r.Name” silinsin mi? @count üründen bu mekân etiketi kaldırılacak.">
+                <button class="icon-action icon-action--danger" title="Sil"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+              </form>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

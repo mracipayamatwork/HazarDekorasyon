@@ -1,0 +1,88 @@
+@{
+    var path = Context.Request.Path.Value ?? "";
+    string Active(string p) => path.Equals(p, StringComparison.OrdinalIgnoreCase) || (p != "/Admin" && path.StartsWith(p, StringComparison.OrdinalIgnoreCase)) ? "is-active" : "";
+    var flash = TempData.Peek("Flash") as string;
+    var flashType = TempData.Peek("FlashType") as string ?? "success";
+    var isLogin = path.StartsWith("/Admin/Giris", StringComparison.OrdinalIgnoreCase);
+}
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>@ViewData["Title"] · Hazar Yönetim</title>
+  <link rel="icon" href="~/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="~/assets/css/admin.css" asp-append-version="true" />
+</head>
+<body class="@(isLogin ? "admin-login" : "admin")">
+@if (isLogin)
+{
+  @RenderBody()
+}
+else
+{
+  <aside class="aside" data-aside>
+    <a href="/Admin" class="aside__brand">
+      <svg viewBox="0 0 44 52" aria-hidden="true"><path d="M4 51 V22 A18 18 0 0 1 40 22 V51" /><text x="22" y="42" text-anchor="middle">H</text></svg>
+      <span><b>HAZAR</b><small>Yönetim Paneli</small></span>
+    </a>
+    <nav class="aside__nav">
+      <small>Genel</small>
+      <a href="/Admin" class="@Active("/Admin")"><svg viewBox="0 0 24 24"><path d="M3 12 12 4l9 8M5 10v10h14V10"/></svg>Panel</a>
+      <small>Katalog</small>
+      <a href="/Admin/Urunler" class="@Active("/Admin/Urunler")"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Ürünler</a>
+      <a href="/Admin/Kategoriler" class="@Active("/Admin/Kategoriler")"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Kategoriler</a>
+      <a href="/Admin/Tonlar" class="@Active("/Admin/Tonlar")"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>Renk Tonları</a>
+      <a href="/Admin/Mekanlar" class="@Active("/Admin/Mekanlar")"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13"/></svg>Mekânlar</a>
+      <small>Fiyatlandırma</small>
+      <a href="/Admin/Fiyatlar" class="@Active("/Admin/Fiyatlar")"><svg viewBox="0 0 24 24"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/></svg>Fiyat Listesi</a>
+      <small>Site</small>
+      <a href="/Admin/Ayarlar" class="@Active("/Admin/Ayarlar")"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Site Ayarları</a>
+      <a href="/Admin/Sifre" class="@Active("/Admin/Sifre")"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Şifre Değiştir</a>
+    </nav>
+    <div class="aside__foot">
+      <a href="/" target="_blank" rel="noopener" class="abtn abtn--ghost abtn--block">Siteyi Görüntüle ↗</a>
+      <form method="post" action="/Admin/Cikis">
+        @Html.AntiForgeryToken()
+        <button class="abtn abtn--text abtn--block">Çıkış yap (@User.Identity?.Name)</button>
+      </form>
+    </div>
+  </aside>
+  <div class="aside-backdrop" data-aside-close></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="topbar__menu" data-aside-open aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <div>
+        @if (ViewData["Crumb"] is string crumb)
+        {
+          <small class="topbar__crumb">@Html.Raw(crumb)</small>
+        }
+        <h1>@ViewData["Title"]</h1>
+      </div>
+      <div class="topbar__actions">@await RenderSectionAsync("Actions", required: false)</div>
+    </header>
+
+    @if (!string.IsNullOrEmpty(flash))
+    {
+      TempData.Remove("Flash"); TempData.Remove("FlashType");
+      <div class="flash flash--@flashType" data-flash>
+        <span>@flash</span>
+        <button type="button" onclick="this.parentElement.remove()" aria-label="Kapat">✕</button>
+      </div>
+    }
+
+    <div class="content">
+      @RenderBody()
+    </div>
+  </div>
+}
+  <script src="~/assets/js/patterns.js" asp-append-version="true"></script>
+  <script src="~/assets/js/admin.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

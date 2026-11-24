@@ -1,0 +1,68 @@
+@page
+@model HazarDekorasyon.Web.Pages.Admin.Tonlar.IndexModel
+@{
+    ViewData["Title"] = "Renk Tonları";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Katalog";
+}
+
+<form method="post" asp-page-handler="Save" class="card">
+  <div class="card__head"><div><h2>@(Model.Editing ? $"“{Model.Input.Name}” tonunu düzenle" : "Yeni renk tonu")</h2><p>Katalogdaki renk filtresinde ve ana sayfadaki “Renkleri keşfet” bölümünde görünür.</p></div></div>
+  <input type="hidden" asp-for="Input.Id" />
+  <div class="form-grid">
+    <div class="field col-3">
+      <label asp-for="Input.Name"></label>
+      <input asp-for="Input.Name" class="input" data-slug-source />
+      <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+    </div>
+    <div class="field col-3">
+      <label asp-for="Input.Slug"></label>
+      <input asp-for="Input.Slug" class="input" data-slug-target />
+      <span asp-validation-for="Input.Slug" class="field-validation-error"></span>
+    </div>
+    <div class="field col-2">
+      <label for="Input_Color1">Açık renk</label>
+      <div class="color-field" data-color><input type="color" value="@Model.Input.Color1" /><input type="text" id="Input_Color1" name="Input.Color1" value="@Model.Input.Color1" class="input" maxlength="7" /></div>
+      <span asp-validation-for="Input.Color1" class="field-validation-error"></span>
+    </div>
+    <div class="field col-2">
+      <label for="Input_Color2">Koyu renk</label>
+      <div class="color-field" data-color><input type="color" value="@Model.Input.Color2" /><input type="text" id="Input_Color2" name="Input.Color2" value="@Model.Input.Color2" class="input" maxlength="7" /></div>
+      <span asp-validation-for="Input.Color2" class="field-validation-error"></span>
+    </div>
+    <div class="field col-2">
+      <label asp-for="Input.SortOrder"></label>
+      <input asp-for="Input.SortOrder" class="input" type="number" />
+    </div>
+  </div>
+  <div class="form-actions" style="margin-top:16px">
+    @if (Model.Editing) { <a href="/Admin/Tonlar" class="abtn abtn--ghost">Vazgeç</a> }
+    <button class="abtn abtn--primary">@(Model.Editing ? "Kaydet" : "Ekle")</button>
+  </div>
+</form>
+
+<div class="card card--flush">
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead><tr><th></th><th>Ton</th><th>Kısa ad</th><th>Renkler</th><th class="num">Ürün</th><th class="num">Sıra</th><th></th></tr></thead>
+      <tbody>
+        @foreach (var (t, count) in Model.Rows)
+        {
+          <tr>
+            <td style="width:50px"><span class="swatch-dot" style="width:34px;height:34px"><i style="background:@t.Color1"></i><i style="background:@t.Color2"></i></span></td>
+            <td><b>@t.Name</b></td>
+            <td><code>@t.Slug</code></td>
+            <td><small style="color:inherit"><code>@t.Color1</code> · <code>@t.Color2</code></small></td>
+            <td class="num">@count</td>
+            <td class="num">@t.SortOrder</td>
+            <td class="actions">
+              <a class="icon-action" href="/Admin/Tonlar?duzenle=@t.Id" title="Düzenle"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+              <form method="post" asp-page-handler="Delete" asp-route-id="@t.Id" data-confirm="“@t.Name” tonu silinsin mi?">
+                <button class="icon-action icon-action--danger" title="Sil"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+              </form>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

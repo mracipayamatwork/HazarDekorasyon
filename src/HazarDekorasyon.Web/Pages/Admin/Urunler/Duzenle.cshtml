@@ -1,0 +1,237 @@
+@page "{id:int?}"
+@model HazarDekorasyon.Web.Pages.Admin.Urunler.DuzenleModel
+@{
+    ViewData["Title"] = Model.IsNew ? "Yeni Ürün" : $"{Model.Input.Name} · {Model.Input.Variant}";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / <a href=\"/Admin/Urunler\">Ürünler</a>";
+    var badges = Html.GetEnumSelectList<ProductBadge>();
+}
+@section Actions {
+  @if (!Model.IsNew)
+  {
+    <a href="/Admin/Urunler/Duzenle?kopya=@Model.Input.Id" class="abtn abtn--ghost">Kopyala (yeni renk)</a>
+    <a href="/katalog?urun=@Model.Input.Code" target="_blank" rel="noopener" class="abtn abtn--ghost">Sitede gör ↗</a>
+  }
+}
+
+<form method="post" enctype="multipart/form-data" class="editor" data-product-form>
+  <div style="display:grid;gap:24px">
+    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+    <div class="card">
+      <div class="form-grid">
+        <h3 class="form-section">Temel bilgiler</h3>
+        <div class="field col-3">
+          <label asp-for="Input.Code"></label>
+          <input asp-for="Input.Code" class="input" />
+          <span asp-validation-for="Input.Code" class="field-validation-error"></span>
+        </div>
+        <div class="field col-5" style="grid-column:span 5">
+          <label asp-for="Input.Name"></label>
+          <input asp-for="Input.Name" class="input" data-preview-name placeholder="ör. Osmanlı Damask" />
+          <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.Variant"></label>
+          <input asp-for="Input.Variant" class="input" data-preview-variant placeholder="ör. Altın Krem" />
+          <span asp-validation-for="Input.Variant" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.Collection"></label>
+          <input asp-for="Input.Collection" class="input" list="collections" />
+          <datalist id="collections">@foreach (var c in Model.Collections) { <option value="@c"></option> }</datalist>
+          <span class="help">Aynı koleksiyondaki ürünler, renk seçeneği olarak birlikte gösterilir.</span>
+          <span asp-validation-for="Input.Collection" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.CategoryId"></label>
+          <select asp-for="Input.CategoryId" class="select">
+            <option value="0">Seçin…</option>
+            @foreach (var c in Model.Categories) { <option value="@c.Id">@c.Name</option> }
+          </select>
+          <span asp-validation-for="Input.CategoryId" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.ToneId"></label>
+          <select asp-for="Input.ToneId" class="select">
+            <option value="0">Seçin…</option>
+            @foreach (var t in Model.Tones) { <option value="@t.Id">@t.Name</option> }
+          </select>
+          <span asp-validation-for="Input.ToneId" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.Material"></label>
+          <input asp-for="Input.Material" class="input" list="materials" />
+          <datalist id="materials">@foreach (var m in Model.Materials) { <option value="@m"></option> }</datalist>
+          <span asp-validation-for="Input.Material" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.Badge"></label>
+          <select asp-for="Input.Badge" asp-items="badges" class="select"></select>
+        </div>
+        <div class="field col-4">
+          <span class="field-label">Durum</span>
+          <label class="check" style="height:44px"><input asp-for="Input.IsActive" /> Sitede yayında</label>
+        </div>
+        <div class="field col-12">
+          <span class="field-label">Uygun mekânlar</span>
+          <div class="checks">
+            @foreach (var r in Model.Rooms)
+            {
+              <label class="check"><input type="checkbox" name="SelectedRooms" value="@r.Id" checked="@Model.SelectedRooms.Contains(r.Id)" /> @r.Name</label>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="form-grid">
+        <h3 class="form-section">Görsel</h3>
+        <div class="field col-12">
+          <div class="segmented">
+            <label><input type="radio" name="Mode" value="pattern" checked="@(Model.Mode != "photo")" data-mode /><span>Desen motoru (otomatik çizim)</span></label>
+            <label><input type="radio" name="Mode" value="photo" checked="@(Model.Mode == "photo")" data-mode /><span>Fotoğraf</span></label>
+          </div>
+        </div>
+
+        <div class="col-12 mode-panel" data-panel="pattern">
+          <div class="form-grid">
+            <div class="field col-6">
+              <label asp-for="Input.PatternType"></label>
+              <select asp-for="Input.PatternType" class="select" data-p="type">
+                @foreach (var (val, label) in AdminPageModel.PatternTypes) { <option value="@val">@label</option> }
+              </select>
+              <span asp-validation-for="Input.PatternType" class="field-validation-error"></span>
+            </div>
+            <div class="field col-6">
+              <label asp-for="Input.Seed"></label>
+              <div class="color-field">
+                <input asp-for="Input.Seed" class="input" type="number" min="1" max="9999" data-p="seed" />
+                <button type="button" class="abtn abtn--ghost" data-reseed title="Rastgele dağılımı değiştir">↻ Karıştır</button>
+              </div>
+              <span class="help">Yaprak, yıldız gibi dağınık desenlerin yerleşimini değiştirir.</span>
+            </div>
+            @foreach (var (prop, label, key) in new[] { ("BgColor", "Zemin rengi", "bg"), ("FgColor", "Desen rengi", "fg"), ("AccentColor", "Vurgu rengi", "ac"), ("Color3", "3. renk (isteğe bağlı)", "c3") })
+            {
+              var val = (string?)typeof(Product).GetProperty(prop)!.GetValue(Model.Input);
+              <div class="field col-3">
+                <label for="Input_@prop">@label</label>
+                <div class="color-field" data-color>
+                  <input type="color" value="@(val is { Length: 7 } ? val : "#cccccc")" aria-label="@label" />
+                  <input type="text" id="Input_@prop" name="Input.@prop" value="@val" class="input" maxlength="7" data-p="@key" placeholder="#rrggbb" />
+                </div>
+                @Html.ValidationMessage("Input." + prop, null, new { @class = "field-validation-error" })
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="col-12 mode-panel" data-panel="photo">
+          <div class="form-grid">
+            <div class="field col-6">
+              <label for="Upload">Fotoğraf yükle</label>
+              <input type="file" id="Upload" name="Upload" accept=".jpg,.jpeg,.png,.webp" class="input" style="padding-top:9px" data-upload />
+              <span class="help">JPG, PNG veya WEBP · en fazla 5 MB. Yüklenirse aşağıdaki adres yerine kullanılır.</span>
+              @Html.ValidationMessage("Upload", null, new { @class = "field-validation-error" })
+            </div>
+            <div class="field col-6">
+              <label asp-for="Input.PhotoUrl"></label>
+              <input asp-for="Input.PhotoUrl" class="input" placeholder="https://… veya /uploads/…" data-p="photo" />
+              <span asp-validation-for="Input.PhotoUrl" class="field-validation-error"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="form-grid">
+        <h3 class="form-section">Ölçü & fiyat</h3>
+        <div class="field col-4">
+          <label asp-for="Input.Size"></label>
+          <input asp-for="Input.Size" class="input" />
+        </div>
+        <div class="field col-2">
+          <label asp-for="Input.RollWidth"></label>
+          <input asp-for="Input.RollWidth" type="text" inputmode="decimal" class="input" />
+          <span asp-validation-for="Input.RollWidth" class="field-validation-error"></span>
+        </div>
+        <div class="field col-2">
+          <label asp-for="Input.RollLength"></label>
+          <input asp-for="Input.RollLength" type="text" inputmode="decimal" class="input" />
+          <span asp-validation-for="Input.RollLength" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.RepeatCm"></label>
+          <input asp-for="Input.RepeatCm" class="input" type="number" min="0" max="500" />
+          <span class="help">0 = serbest eşleşme</span>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.Price"></label>
+          <input asp-for="Input.Price" type="text" inputmode="decimal" class="input" placeholder="Boş bırakılırsa fiyat gösterilmez" />
+          <span class="help">Normal ürünlerde rulo fiyatı, özel ölçülü ürünlerde m² fiyatı. İşçilik, ayarlardaki rulo işçiliğinden eklenir.</span>
+          <span asp-validation-for="Input.Price" class="field-validation-error"></span>
+        </div>
+        <div class="field col-4">
+          <span class="field-label">Ölçü tipi</span>
+          <label class="check" style="height:44px"><input asp-for="Input.IsCustomSize" /> Özel ölçü (panoramik, m² ile)</label>
+        </div>
+        <div class="field col-4">
+          <label asp-for="Input.SortOrder"></label>
+          <input asp-for="Input.SortOrder" class="input" type="number" />
+          <span class="help">Küçük sayı önce gösterilir.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="/Admin/Urunler" class="abtn abtn--ghost">Vazgeç</a>
+      <button class="abtn abtn--ghost" name="saveAndNew" value="1">Kaydet ve yeni ekle</button>
+      <button class="abtn abtn--primary">Kaydet</button>
+    </div>
+  </div>
+
+  <aside class="preview">
+    <div class="preview__swatch" data-preview></div>
+    <div class="preview__meta"><b data-preview-title>@Model.Input.Name</b><small data-preview-sub>@Model.Input.Variant</small></div>
+  </aside>
+</form>
+
+@section Scripts {
+<script>
+(function () {
+  const form = document.querySelector('[data-product-form]');
+  const prev = form.querySelector('[data-preview]');
+  const val = (k) => (form.querySelector(`[data-p="${k}"]`) || {}).value || '';
+  let localPhoto = null;
+  function mode() { return form.querySelector('[data-mode]:checked').value; }
+  function update() {
+    const m = mode();
+    form.querySelectorAll('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== m));
+    if (m === 'photo') {
+      const src = localPhoto || val('photo');
+      prev.style.backgroundImage = src ? `url("${src}")` : 'none';
+      prev.style.backgroundSize = 'cover';
+      prev.style.backgroundPosition = 'center';
+      prev.style.backgroundRepeat = 'no-repeat';
+    } else {
+      HazarAdmin.paint(prev, { type: val('type'), bg: val('bg'), fg: val('fg'), ac: val('ac'), c3: val('c3'), seed: val('seed'), scale: 1 });
+    }
+    form.querySelector('[data-preview-title]').textContent = form.querySelector('[data-preview-name]').value || 'Ürün adı';
+    form.querySelector('[data-preview-sub]').textContent = form.querySelector('[data-preview-variant]').value || '';
+  }
+  form.addEventListener('input', update);
+  form.addEventListener('change', update);
+  form.querySelector('[data-reseed]').addEventListener('click', () => {
+    form.querySelector('[data-p="seed"]').value = Math.floor(Math.random() * 999) + 1;
+    update();
+  });
+  form.querySelector('[data-upload]').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    localPhoto = f ? URL.createObjectURL(f) : null;
+    update();
+  });
+  update();
+})();
+</script>
+}

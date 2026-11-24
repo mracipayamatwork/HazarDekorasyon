@@ -1,0 +1,62 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Hoş geldiniz";
+    ViewData["Crumb"] = "Yönetim Paneli";
+    var max = Math.Max(1, Model.ByCategory.Select(x => x.Count).DefaultIfEmpty(1).Max());
+}
+@section Actions {
+  <a href="/Admin/Urunler/Duzenle" class="abtn abtn--primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Yeni Ürün</a>
+}
+
+<div class="stats">
+  <a href="/Admin/Urunler" class="stat"><small>Ürünler</small><b>@Model.ProductCount</b><span>@Model.ActiveProductCount aktif</span></a>
+  <a href="/Admin/Kategoriler" class="stat"><small>Kategoriler</small><b>@Model.CategoryCount</b><span>Katalog bölümleri</span></a>
+  <a href="/Admin/Fiyatlar" class="stat"><small>Fiyat kalemi</small><b>@Model.PriceOptionCount</b><span>@Model.ServiceCount hizmette</span></a>
+  <a href="/Admin/Urunler?fiyatsiz=1" class="stat"><small>Fiyatı girilmemiş</small><b>@Model.NoPriceCount</b><span>@(Model.NoPriceCount > 0 ? "Fiyat ekleyin →" : "Hepsi tamam ✓")</span></a>
+</div>
+
+<div class="card">
+  <div class="card__head"><div><h2>Hızlı işlemler</h2><p>En sık yapılan işlemlere tek tıkla ulaşın.</p></div></div>
+  <div class="quick">
+    <a href="/Admin/Urunler/Duzenle"><i>＋</i><span><b>Ürün ekle</b><small>Desen veya fotoğraflı ürün</small></span></a>
+    <a href="/Admin/Fiyatlar"><i>₺</i><span><b>Fiyatları güncelle</b><small>Hizmet ve ürün fiyatları</small></span></a>
+    <a href="/Admin/Kategoriler/Duzenle"><i>☰</i><span><b>Kategori ekle</b><small>Kataloğa yeni bölüm</small></span></a>
+    <a href="/Admin/Ayarlar"><i>⚙</i><span><b>İletişim bilgileri</b><small>Telefon, adres, duyuru</small></span></a>
+  </div>
+</div>
+
+<div class="form-grid">
+  <div class="card col-6">
+    <div class="card__head"><div><h2>Kategorilere göre ürünler</h2></div></div>
+    <div style="display:grid;gap:12px">
+      @foreach (var (name, count) in Model.ByCategory)
+      {
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:14px"><span>@name</span><b>@count</b></div>
+          <div style="height:8px;border-radius:4px;background:var(--cream);overflow:hidden;margin-top:4px">
+            <div style="height:100%;width:@((count * 100 / max).ToString())%;background:var(--bordo);border-radius:4px"></div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="card card--flush col-6">
+    <div class="card__head"><div><h2>Son eklenen ürünler</h2></div><a href="/Admin/Urunler" class="abtn abtn--ghost abtn--sm">Tümü</a></div>
+    <div class="table-wrap" style="margin-top:12px">
+      <table class="tbl">
+        <tbody>
+          @foreach (var p in Model.Recent)
+          {
+            <tr>
+              <td style="width:62px"><div class="thumb" data-swatch data-type="@p.PatternType" data-bg="@p.BgColor" data-fg="@p.FgColor" data-ac="@p.AccentColor" data-c3="@p.Color3" data-seed="@p.Seed" data-photo="@p.PhotoUrl" data-scale=".35"></div></td>
+              <td><b>@p.Name</b><small>@p.Variant · @p.Code</small></td>
+              <td>@p.Category?.Name</td>
+              <td class="actions"><a class="abtn abtn--ghost abtn--sm" href="/Admin/Urunler/Duzenle/@p.Id">Düzenle</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

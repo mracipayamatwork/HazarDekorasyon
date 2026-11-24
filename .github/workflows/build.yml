@@ -1,0 +1,35 @@
+# Her gönderimde projenin derlendiğini kontrol eder.
+name: Derleme
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu al
+        uses: actions/checkout@v4
+
+      - name: .NET kur
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Paketleri geri yükle
+        run: dotnet restore
+
+      - name: Derle
+        run: dotnet build --no-restore -c Release
+
+      - name: Yayın paketi oluştur
+        run: dotnet publish src/HazarDekorasyon.Web -c Release --no-build -o publish
+
+      - name: Paketi sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: hazar-dekorasyon-web
+          path: publish
+          retention-days: 14

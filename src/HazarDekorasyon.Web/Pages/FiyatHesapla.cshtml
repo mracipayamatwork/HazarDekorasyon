@@ -1,0 +1,77 @@
+@page
+@model FiyatHesaplaModel
+@{
+    ViewData["Title"] = "Fiyat Hesapla | Hazar Dekorasyon";
+    ViewData["Description"] = "Duvar kağıdı, gergi tavan, boya ve kartonpiyer için oda ölçülerinize göre tahmini fiyatı anında hesaplayın.";
+    ViewData["BodyClass"] = "page-fiyat";
+}
+@section Styles {
+  <link rel="stylesheet" href="~/assets/css/fiyat.css" asp-append-version="true" />
+}
+
+<section class="khero fhero">
+  <div class="container khero__inner">
+    <nav class="crumbs" aria-label="Sayfa yolu"><a href="/">Ana Sayfa</a><span>/</span><b>Fiyat Hesapla</b></nav>
+    <h1 class="khero__title">Fiyat <em>Hesapla</em></h1>
+    <p class="lead">Odanızın ölçülerini girin, istediğiniz hizmetleri ve seçenekleri işaretleyin; tahmini bütçenizi anında görün. Kesin fiyat, ücretsiz keşif sonrasında verilir.</p>
+  </div>
+</section>
+
+<section class="calc-page">
+  <div class="container calc-page__grid">
+    <div class="calc-steps">
+      <!-- 1. Ölçüler -->
+      <div class="cstep reveal">
+        <div class="cstep__head"><span class="cstep__no">1</span><div><h2>Oda ölçüleri</h2><p>Ölçüleri metre cinsinden girin. Emin değilseniz yaklaşık değer yeterli.</p></div></div>
+        <div class="dims">
+          <label class="dim"><span>Oda eni</span><input type="number" min="0.5" max="50" step="0.1" value="4" data-dim="w" inputmode="decimal" /><i>m</i></label>
+          <label class="dim"><span>Oda boyu</span><input type="number" min="0.5" max="50" step="0.1" value="5" data-dim="l" inputmode="decimal" /><i>m</i></label>
+          <label class="dim"><span>Tavan yüksekliği</span><input type="number" min="1.5" max="10" step="0.05" value="2.7" data-dim="h" inputmode="decimal" /><i>m</i></label>
+          <label class="dim"><span>Kapı / pencere</span><input type="number" min="0" max="30" step="1" value="2" data-dim="o" inputmode="numeric" /><i>adet</i></label>
+        </div>
+        <div class="dims__calc">
+          <div><small>Duvar alanı</small><b data-area="wall">—</b></div>
+          <div><small>Tavan alanı</small><b data-area="ceiling">—</b></div>
+          <div><small>Oda çevresi</small><b data-area="perimeter">—</b></div>
+        </div>
+        <p class="dims__note">Duvar alanından her kapı/pencere için yaklaşık 1,8 m² düşülür.</p>
+      </div>
+
+      <!-- 2. Hizmetler -->
+      <div class="cstep reveal" style="--d:.08s">
+        <div class="cstep__head"><span class="cstep__no">2</span><div><h2>Hizmetler</h2><p>Bir veya birden fazla hizmet seçebilirsiniz.</p></div></div>
+        <div class="services-pick" data-services></div>
+      </div>
+    </div>
+
+    <!-- Özet -->
+    <aside class="csummary reveal" style="--d:.12s">
+      <div class="csummary__card">
+        <p class="eyebrow">Tahmini Bütçe</p>
+        <div class="csummary__lines" data-lines></div>
+        <div class="csummary__empty" data-empty>Hesaplamak için en az bir hizmet seçin.</div>
+        <div class="csummary__totals" data-totals hidden>
+          <div><span>Ara toplam (KDV hariç)</span><b data-subtotal></b></div>
+          <div data-vat-row><span data-vat-label>KDV</span><b data-vat></b></div>
+          <div class="csummary__min" data-min-row hidden><span>Minimum iş bedeli uygulandı</span><b></b></div>
+        </div>
+        <div class="csummary__total" data-total-box hidden>
+          <small>Tahmini toplam (KDV dahil)</small>
+          <b data-total>—</b>
+          <span data-range></span>
+        </div>
+        <a class="btn btn--primary btn--lg btn--block" target="_blank" rel="noopener" data-send>
+          <svg viewBox="0 0 24 24"><path d="M3 21l1.6-4.6A8.5 8.5 0 1 1 8 19.6z"/></svg>
+          WhatsApp'tan Teklif İste
+        </a>
+        <a class="btn btn--ghost btn--block" href="tel:@Model.Site.Phone">Ücretsiz keşif için arayın</a>
+        <p class="csummary__note" data-note></p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+@section Scripts {
+  <script>window.HAZAR_PRICING = @Html.Raw(Model.PricingJson);</script>
+  <script src="~/assets/js/fiyat.js" asp-append-version="true"></script>
+}

@@ -139,3 +139,18 @@ dist
 .claude/
 _site/
 Thumbs.db
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+*.suo
+publish/
+
+# Uygulama verisi (yerel veritabanı, yüklenen görseller, gizli ayarlar)
+**/App_Data/*.db
+**/App_Data/*.db-shm
+**/App_Data/*.db-wal
+**/wwwroot/uploads/
+**/appsettings.Local.json

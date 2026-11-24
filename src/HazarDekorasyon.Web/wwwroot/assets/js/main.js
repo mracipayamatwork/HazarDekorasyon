@@ -4,11 +4,12 @@
     "Odanda Gör" sahnesi, lightbox, bildirim)
    ========================================================= */
 (function () {
-  const { PRODUCTS, TONES, CATEGORIES, ROOMS, applySwatch } = window.HazarData;
-  const PHONE = '905432038730';
+  const { PRODUCTS, TONES, CATEGORIES, ROOMS, SETTINGS, applySwatch, money } = window.HazarData;
+  const PHONE = (SETTINGS.whatsApp || '905432038730').replace(/\D/g, '');
+  const TEL = SETTINGS.phone || '+' + PHONE;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const byId = (id) => PRODUCTS.find((p) => p.id === id);
+  const byId = (id) => PRODUCTS.find((p) => p.id === id || p.code === id);
   const toneOf = (id) => TONES.find((t) => t.id === id);
   const catOf = (id) => CATEGORIES.find((c) => c.id === id);
   const roomName = (id) => (ROOMS.find((r) => r.id === id) || {}).name || id;
@@ -79,7 +80,7 @@
       </div>
       <div class="pcard__info">
         <div><h3>${p.name}</h3><p>${p.variant} · ${p.code}</p></div>
-        <span class="tone-dot" title="${tone ? tone.name : ''}" style="background:linear-gradient(135deg, ${tone.c[0]} 50%, ${tone.c[1]} 50%)"></span>
+        ${tone ? `<span class="tone-dot" title="${tone.name}" style="background:linear-gradient(135deg, ${tone.c[0]} 50%, ${tone.c[1]} 50%)"></span>` : ''}
       </div>`;
     applySwatch($('.pcard__swatch', el), p, 0.85);
     return el;
@@ -267,11 +268,12 @@
               <label>Duvar yüksekliği (m)<input type="number" min="0.5" step="0.05" value="2.7" data-calc-h /></label>
             </div>
             <div class="calc__result"><b data-calc-out>—</b><span data-calc-note></span></div>
+            <div class="calc__price" data-calc-price hidden><span>Tahmini tutar</span><b data-calc-price-val></b><small data-calc-price-note></small></div>
           </div>
           <div class="pmodal__actions">
             <a class="btn btn--primary btn--lg" target="_blank" rel="noopener" data-m-wa>${ICON.wa} WhatsApp'tan Fiyat Al</a>
             <button class="round-btn" data-m-fav aria-label="Favorilere ekle">${ICON.heart}</button>
-            <a class="round-btn" href="tel:+${PHONE}" aria-label="Ara">${ICON.phone}</a>
+            <a class="round-btn" href="tel:${TEL}" aria-label="Ara">${ICON.phone}</a>
           </div>
           <p class="pmodal__note">Fiyatlar ölçü ve uygulama detayına göre belirlenir. Ücretsiz keşif için bize ulaşın.</p>
         </div>
@@ -313,17 +315,28 @@
     const h = parseFloat($('[data-calc-h]', modal).value) || 0;
     const out = $('[data-calc-out]', modal), note = $('[data-calc-note]', modal);
     if (!w || !h) { out.textContent = '—'; note.textContent = 'Ölçüleri girin'; return; }
+    const priceBox = $('[data-calc-price]', modal);
+    let total = null;
     if (p.custom) {
       out.textContent = (w * h).toFixed(1).replace('.', ',') + ' m²';
       note.textContent = 'Duvarınızın ölçüsüne özel tek parça baskı';
-      return;
+      if (p.price) total = w * h * p.price;
+    } else {
+      const strips = Math.ceil(w / p.rollW);
+      const stripLen = h + (p.repeat || 0) / 100 + 0.05;
+      const perRoll = Math.max(1, Math.floor(p.rollL / stripLen));
+      const rolls = Math.ceil(strips / perRoll);
+      out.textContent = rolls + ' rulo';
+      note.textContent = `${strips} şerit · rulo başına ${perRoll} şerit (desen payı dahil, yaklaşık)`;
+      if (p.price) total = rolls * (p.price + (Number(SETTINGS.laborPerRoll) || 0));
     }
-    const strips = Math.ceil(w / p.rollW);
-    const stripLen = h + (p.repeat || 0) / 100 + 0.05;
-    const perRoll = Math.max(1, Math.floor(p.rollL / stripLen));
-    const rolls = Math.ceil(strips / perRoll);
-    out.textContent = rolls + ' rulo';
-    note.textContent = `${strips} şerit · rulo başına ${perRoll} şerit (desen payı dahil, yaklaşık)`;
+    priceBox.hidden = total == null;
+    if (total != null) {
+      const vat = Number(SETTINGS.vatRate) || 0;
+      const withVat = SETTINGS.pricesIncludeVat ? total : total * (1 + vat / 100);
+      $('[data-calc-price-val]', modal).textContent = money(withVat);
+      $('[data-calc-price-note]', modal).textContent = (p.custom ? 'Baskı + uygulama' : 'Malzeme + uygulama işçiliği') + ', KDV dahil, yaklaşık';
+    }
   }
   function fillModal(p) {
     modalProduct = p;
@@ -405,7 +418,7 @@
     const list = $('[data-dlist]', drawer), foot = $('[data-dfoot]', drawer);
     if (!items.length) {
       list.innerHTML = `<div class="drawer__empty">${ICON.heart}<p>Henüz favori deseniniz yok.<br/>Beğendiğiniz desenlerdeki ♥ simgesine dokunun.</p></div>`;
-      foot.innerHTML = `<a href="katalog.html" class="btn btn--dark btn--block">Kataloğa Göz At</a>`;
+      foot.innerHTML = `<a href="/katalog" class="btn btn--dark btn--block">Kataloğa Göz At</a>`;
       return;
     }
     list.innerHTML = '';
@@ -417,7 +430,7 @@
       list.appendChild(row);
     });
     const text = 'Merhaba, web sitenizde beğendiğim duvar kağıtları:\n' + items.map((p) => '• ' + productLabel(p)).join('\n') + '\nBu desenler için fiyat bilgisi alabilir miyim?';
-    foot.innerHTML = `<a href="${wa(text)}" target="_blank" rel="noopener" class="btn btn--primary btn--block">${ICON.wa} Listeyi WhatsApp'tan Gönder</a><a href="katalog.html" class="btn btn--ghost btn--block">Kataloğa Devam Et</a>`;
+    foot.innerHTML = `<a href="${wa(text)}" target="_blank" rel="noopener" class="btn btn--primary btn--block">${ICON.wa} Listeyi WhatsApp'tan Gönder</a><a href="/katalog" class="btn btn--ghost btn--block">Kataloğa Devam Et</a>`;
   }
   function openDrawer() {
     if (!drawer) buildDrawer();
@@ -551,5 +564,5 @@
 
   Fav.sync();
 
-  window.Hazar = { $, $$, byId, card, createRoom, openProduct, openLightbox, toast, wa, observe, Fav, toneOf, catOf, PHONE };
+  window.Hazar = { $, $$, byId, card, createRoom, openProduct, openLightbox, toast, wa, observe, Fav, toneOf, catOf, PHONE, TEL };
 })();

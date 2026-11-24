@@ -1,0 +1,101 @@
+@page
+@model HazarDekorasyon.Web.Pages.Admin.Fiyatlar.IndexModel
+@{
+    ViewData["Title"] = "Fiyat Listesi";
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / Fiyatlandırma";
+}
+@section Actions {
+  <a href="/fiyat-hesapla" target="_blank" rel="noopener" class="abtn abtn--ghost">Hesaplayıcıyı gör ↗</a>
+  <a href="/Admin/Fiyatlar/Hizmet" class="abtn abtn--primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Yeni Hizmet</a>
+}
+
+<div class="card">
+  <div class="card__head"><div><h2>Toplu fiyat güncelleme</h2><p>Tüm fiyatlara tek seferde yüzde artış veya indirim uygulayın.</p></div></div>
+  <form method="post" asp-page-handler="Bulk" class="bulk" data-confirm="Seçilen fiyatların tamamı güncellenecek. Devam edilsin mi?">
+    <div class="field">
+      <label for="Percent">Değişim (%)</label>
+      <input id="Percent" name="Percent" class="input" type="text" inputmode="decimal" placeholder="ör. 15 veya -5" required />
+    </div>
+    <div class="field" style="width:240px">
+      <label for="Target">Uygulanacak fiyatlar</label>
+      <select id="Target" name="Target" class="select">
+        <option value="services">Hizmet fiyatları (hesaplayıcı)</option>
+        <option value="products">Ürün rulo / m² fiyatları</option>
+        <option value="all">Hepsi</option>
+      </select>
+    </div>
+    <div class="field" style="width:150px">
+      <label for="Rounding">Yuvarlama</label>
+      <select id="Rounding" name="Rounding" class="select">
+        <option value="1">1 ₺</option><option value="5">5 ₺</option><option value="10" selected>10 ₺</option><option value="50">50 ₺</option><option value="100">100 ₺</option>
+      </select>
+    </div>
+    <button class="abtn">Uygula</button>
+  </form>
+</div>
+
+<form method="post" asp-page-handler="Save" class="price-grid">
+  @foreach (var s in Model.Services)
+  {
+    <div class="price-svc">
+      <div class="price-svc__head">
+        <div>
+          <h3>@s.Name @if (!s.IsActive) { <span class="pill pill--off">Pasif</span> }</h3>
+          <p>@s.Description</p>
+        </div>
+        <a href="/Admin/Fiyatlar/Hizmet/@s.Id" class="abtn abtn--ghost abtn--sm">Seçenekleri düzenle</a>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Seçenek</th><th>Tür</th><th>Birim</th><th class="num">Birim fiyat (₺)</th></tr></thead>
+          <tbody>
+            @foreach (var o in s.Options)
+            {
+              <tr class="@(o.IsActive ? "" : "is-off")">
+                <td><b>@o.Name</b><small>@o.Description</small></td>
+                <td><span class="pill @(o.Kind == PriceOptionKind.Main ? "" : "pill--new")">@(o.Kind == PriceOptionKind.Main ? "Ana" : "Ek")</span></td>
+                <td>@AdminPageModel.UnitLabel(o.Unit)</td>
+                <td class="num"><input name="Prices[@o.Id]" value="@o.UnitPrice.ToString("0.##")" class="input input--sm input--price" inputmode="decimal" style="margin-left:auto" /></td>
+              </tr>
+            }
+            @if (s.Options.Count == 0)
+            {
+              <tr><td colspan="4" class="empty">Bu hizmette henüz seçenek yok.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+  @if (Model.Services.Count > 0)
+  {
+    <div class="form-actions" style="position:sticky;bottom:16px">
+      <button class="abtn abtn--primary" style="box-shadow:0 10px 30px -10px rgba(122,31,43,.6)">Fiyatları Kaydet</button>
+    </div>
+  }
+  else
+  {
+    <div class="card empty">Henüz hizmet yok. “Yeni Hizmet” ile başlayın.</div>
+  }
+</form>
+
+<div class="card card--flush">
+  <div class="card__head"><div><h2>Ürün fiyatları (materyale göre)</h2><p>Ürün fiyatları her ürünün kendi sayfasından düzenlenir. Ürün detayındaki tahmini tutara rulo başına <b>@Model.LaborPerRoll.ToString("N0") ₺</b> işçilik ve <b>%@Model.VatRate.ToString("0.##")</b> KDV eklenir (<a href="/Admin/Ayarlar" style="color:var(--bordo)">ayarlar</a>).</p></div></div>
+  <div class="table-wrap" style="margin-top:12px">
+    <table class="tbl">
+      <thead><tr><th>Materyal</th><th class="num">Ürün</th><th class="num">En düşük</th><th class="num">En yüksek</th><th></th></tr></thead>
+      <tbody>
+        @foreach (var (mat, info) in Model.ProductPricesByMaterial)
+        {
+          <tr>
+            <td><b>@mat</b></td>
+            <td class="num">@info.Count</td>
+            <td class="num">@(info.Min?.ToString("N0") ?? "—") ₺</td>
+            <td class="num">@(info.Max?.ToString("N0") ?? "—") ₺</td>
+            <td class="actions"><a href="/Admin/Urunler?q=@Uri.EscapeDataString(mat)" class="abtn abtn--ghost abtn--sm">Ürünleri gör</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

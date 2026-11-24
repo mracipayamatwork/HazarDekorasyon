@@ -1,0 +1,84 @@
+@page "{id:int?}"
+@model HazarDekorasyon.Web.Pages.Admin.Fiyatlar.HizmetModel
+@{
+    ViewData["Title"] = Model.IsNew ? "Yeni Hizmet" : Model.Input.Name;
+    ViewData["Crumb"] = "<a href=\"/Admin\">Panel</a> / <a href=\"/Admin/Fiyatlar\">Fiyat Listesi</a>";
+    var kinds = Html.GetEnumSelectList<PriceOptionKind>();
+    var units = Html.GetEnumSelectList<PriceUnit>();
+}
+@section Actions {
+  @if (!Model.IsNew)
+  {
+    <form method="post" action="/Admin/Fiyatlar?handler=DeleteService&id=@Model.Input.Id" data-confirm="“@Model.Input.Name” hizmeti ve tüm seçenekleri silinsin mi?">
+      @Html.AntiForgeryToken()
+      <button class="abtn abtn--danger">Hizmeti Sil</button>
+    </form>
+  }
+}
+
+<form method="post" style="display:grid;gap:24px">
+  <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="field col-4">
+        <label asp-for="Input.Name"></label>
+        <input asp-for="Input.Name" class="input" placeholder="ör. Gergi Tavan" />
+        <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+      </div>
+      <div class="field col-4">
+        <label asp-for="Input.Description"></label>
+        <input asp-for="Input.Description" class="input" placeholder="Hesaplayıcıda başlığın altında görünür" />
+      </div>
+      <div class="field col-2">
+        <label asp-for="Input.SortOrder"></label>
+        <input asp-for="Input.SortOrder" class="input" type="number" />
+      </div>
+      <div class="field col-2">
+        <span class="field-label">Durum</span>
+        <label class="check" style="height:44px"><input asp-for="Input.IsActive" /> Aktif</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card--flush">
+    <div class="card__head" style="padding-bottom:6px">
+      <div>
+        <h2>Seçenekler</h2>
+        <p><b>Ana seçenek:</b> müşteri bunlardan birini seçer (ör. Mat / Saten / Parlak). <b>Ek seçenek:</b> isteğe bağlı eklenir (ör. LED, söküm).<br />
+        <b>Birim:</b> duvar m² = çevre × yükseklik − kapı/pencere · tavan m² = en × boy · çevre = 2 × (en + boy).</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead><tr><th style="min-width:200px">Seçenek adı</th><th style="min-width:180px">Açıklama</th><th>Tür</th><th>Birim</th><th class="num">Fiyat (₺)</th><th class="num">Sıra</th><th>Aktif</th><th>Sil</th></tr></thead>
+        <tbody>
+          @for (var i = 0; i < Model.Options.Count; i++)
+          {
+            var isNew = Model.Options[i].Id == 0;
+            <tr class="opt-row @(isNew ? "opt-row--new" : "")">
+              <td>
+                <input type="hidden" asp-for="Options[i].Id" />
+                <input asp-for="Options[i].Name" class="input" placeholder="@(isNew ? "+ Yeni seçenek" : "")" />
+                <span asp-validation-for="Options[i].Name" class="field-validation-error"></span>
+              </td>
+              <td><input asp-for="Options[i].Description" class="input" /></td>
+              <td><select asp-for="Options[i].Kind" asp-items="kinds" class="select" style="min-width:150px"></select></td>
+              <td><select asp-for="Options[i].Unit" asp-items="units" class="select" style="min-width:180px"></select></td>
+              <td class="num"><input asp-for="Options[i].UnitPrice" type="text" inputmode="decimal" class="input input--price" style="width:110px" /></td>
+              <td class="num"><input asp-for="Options[i].SortOrder" type="number" class="input" style="width:70px" /></td>
+              <td><input asp-for="Options[i].IsActive" class="check" style="width:18px;height:18px;accent-color:var(--bordo)" /></td>
+              <td>@if (!isNew) { <input asp-for="Options[i].Delete" style="width:18px;height:18px;accent-color:var(--err)" title="Kaydederken sil" /> }</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p style="padding:0 24px 20px;margin:12px 0 0;font-size:12.5px;color:var(--muted)">Boş satırlara yazarak yeni seçenek ekleyebilirsiniz. Daha fazla satır için kaydettikten sonra yeni boş satırlar gelir.</p>
+  </div>
+
+  <div class="form-actions">
+    <a href="/Admin/Fiyatlar" class="abtn abtn--ghost">Fiyat listesine dön</a>
+    <button class="abtn abtn--primary">Kaydet</button>
+  </div>
+</form>

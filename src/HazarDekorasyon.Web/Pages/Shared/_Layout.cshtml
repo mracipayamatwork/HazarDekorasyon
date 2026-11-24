@@ -1,0 +1,134 @@
+﻿@inject HazarDekorasyon.Web.Services.SiteSettingsService Settings
+@inject HazarDekorasyon.Web.Services.CatalogService Catalog
+@using HazarDekorasyon.Web.Services
+@{
+    var Site = await Settings.InfoAsync();
+    var footerCats = (await Catalog.ActiveCategoriesAsync()).Take(4).ToList();
+    var path = Context.Request.Path.Value ?? "/";
+    var isHome = path == "/";
+    string Nav(string anchor) => isHome ? anchor : "/" + anchor;
+    var clientData = System.Text.Json.JsonSerializer.Serialize(await Catalog.ClientDataAsync(), CatalogService.Json);
+}
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@ViewData["Title"]</title>
+  <meta name="description" content="@(ViewData["Description"] ?? "Hazar Dekorasyon; yüzlerce duvar kağıdı deseni, gergi tavan uygulamaları ve anahtar teslim dekorasyon hizmeti sunar. Ücretsiz keşif ve ölçü için hemen arayın.")" />
+  <meta name="theme-color" content="#f7f2eb" />
+  <link rel="icon" href="~/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="~/assets/css/style.css" asp-append-version="true" />
+  @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="is-loading @ViewData["BodyClass"]">
+
+  <div class="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <svg class="preloader__mark" viewBox="0 0 60 72"><path d="M6 70 V30 A24 24 0 0 1 54 30 V70" /></svg>
+      <div class="preloader__word">HAZAR</div>
+    </div>
+  </div>
+
+  @if (Site.Announcements.Length > 0)
+  {
+    <div class="topbar">
+      <div class="topbar__track">
+        @for (var r = 0; r < 2; r++)
+        {
+          foreach (var a in Site.Announcements)
+          {
+            <span>✦ @a</span>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <header class="header" data-header>
+    <div class="container header__inner">
+      <a href="/" class="logo" aria-label="Hazar Dekorasyon ana sayfa">
+        <svg class="logo__mark" viewBox="0 0 44 52" aria-hidden="true"><path d="M4 51 V22 A18 18 0 0 1 40 22 V51" /><text x="22" y="42" text-anchor="middle">H</text></svg>
+        <span class="logo__text"><b>HAZAR</b><small>DEKORASYON</small></span>
+      </a>
+      <nav class="nav" data-nav>
+        <a href="@Nav("#hizmetler")">Hizmetler</a>
+        <a href="/katalog" class="@(path.StartsWith("/katalog") ? "is-active" : null)">Katalog</a>
+        <a href="/fiyat-hesapla" class="@(path.StartsWith("/fiyat-hesapla") ? "is-active" : null)">Fiyat Hesapla</a>
+        <a href="@Nav("#odanda-gor")">Odanda Gör</a>
+        <a href="@Nav("#projeler")">Projeler</a>
+        <a href="@Nav("#iletisim")">İletişim</a>
+      </nav>
+      <div class="header__actions">
+        <a href="/katalog" class="icon-btn" aria-label="Katalogda ara">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </a>
+        <button class="icon-btn" data-fav-open aria-label="Favorilerim">
+          <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+          <span class="icon-btn__count" data-fav-count>0</span>
+        </button>
+        <a href="tel:@Site.Phone" class="btn btn--dark btn--sm header__cta">
+          <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+          Hemen Ara
+        </a>
+        <button class="burger" data-burger aria-label="Menüyü aç"><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    @RenderBody()
+  </main>
+
+  <footer class="footer">
+    <div class="footer__cta">
+      <div class="container footer__cta-inner">
+        <h2>Duvarlarınıza <em>yeni bir hikâye</em> yazalım.</h2>
+        <a href="tel:@Site.Phone" class="btn btn--light btn--lg">@Site.PhoneDisplay</a>
+      </div>
+    </div>
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <a href="/" class="logo logo--light">
+          <svg class="logo__mark" viewBox="0 0 44 52" aria-hidden="true"><path d="M4 51 V22 A18 18 0 0 1 40 22 V51" /><text x="22" y="42" text-anchor="middle">H</text></svg>
+          <span class="logo__text"><b>HAZAR</b><small>DEKORASYON</small></span>
+        </a>
+        <p>Duvar kağıdı, gergi tavan ve anahtar teslim dekorasyon uygulamalarında güvenilir çözüm ortağınız.</p>
+      </div>
+      <div>
+        <h4>Hizmetler</h4>
+        <a href="/katalog">Duvar Kağıdı</a><a href="@Nav("#hizmetler")">Gergi Tavan</a><a href="@Nav("#hizmetler")">Anahtar Teslim İş</a><a href="/fiyat-hesapla">Fiyat Hesapla</a>
+      </div>
+      <div>
+        <h4>Katalog</h4>
+        @foreach (var c in footerCats)
+        {
+          <a href="/katalog?kategori=@c.Slug">@c.Name</a>
+        }
+      </div>
+      <div>
+        <h4>İletişim</h4>
+        <a href="tel:@Site.Phone">@Site.PhoneDisplay</a><a href="@Site.WhatsAppUrl()" target="_blank" rel="noopener">WhatsApp</a><a href="@Site.InstagramUrl" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <span>© <span data-year></span> Hazar Dekorasyon. Tüm hakları saklıdır.</span>
+      <a href="#" data-to-top>Yukarı çık ↑</a>
+    </div>
+  </footer>
+
+  <a href="@Site.WhatsAppUrl("Merhaba, web sitenizden ulaşıyorum.")" class="wa-float" target="_blank" rel="noopener" aria-label="WhatsApp ile yazın">
+    <svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.6 10.6 0 1 1 16 26.6zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.8.8a3.3 3.3 0 0 0 2.2-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.6-.4z"/></svg>
+  </a>
+
+  <script>window.HAZAR_DATA = @Html.Raw(clientData);</script>
+  <script src="~/assets/js/patterns.js" asp-append-version="true"></script>
+  <script src="~/assets/js/data.js" asp-append-version="true"></script>
+  <script src="~/assets/js/main.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

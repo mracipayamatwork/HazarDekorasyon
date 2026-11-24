@@ -44,9 +44,10 @@
   }
 
   // Sezonun favorisi kartı
-  const featured = byId('hz1021') || PRODUCTS[0];
+  const HOME = window.HAZAR_HOME || {};
+  const featured = byId(HOME.featured) || PRODUCTS.find((p) => p.badge === 'best') || PRODUCTS[0];
   const fsw = $('[data-hero-swatch]');
-  if (fsw) {
+  if (fsw && featured) {
     applySwatch(fsw, featured, 0.5);
     $('[data-hero-feature-name]').textContent = `${featured.name} · ${featured.variant}`;
     $('[data-hero-feature]').addEventListener('click', () => openProduct(featured.id));
@@ -58,7 +59,7 @@
     TONES.forEach((t) => {
       const a = document.createElement('a');
       a.className = 'tone';
-      a.href = `katalog.html?renk=${t.id}`;
+      a.href = `/katalog?renk=${t.id}`;
       a.innerHTML = `<span class="tone__swatch"><i style="background:${t.c[0]}"></i><i style="background:${t.c[1]}"></i></span>${t.name} Tonlar`;
       tonesEl.appendChild(a);
     });
@@ -68,8 +69,7 @@
   const roomEl = $('[data-room]');
   if (roomEl) {
     const room = createRoom(roomEl, { compare: true });
-    const picks = ['hz1003', 'hz1021', 'hz1017', 'hz1043', 'hz1009', 'hz1012', 'hz1036', 'hz1029', 'hz1046', 'hz1007', 'hz1070', 'hz1061']
-      .map(byId).filter(Boolean);
+    const picks = (HOME.visualizer || []).map(byId).filter(Boolean);
     const picker = $('[data-vis-picker]');
     let active;
     function select(p, btn) {
@@ -89,7 +89,7 @@
       picker.appendChild(b);
       if (!k) { room.set(p, false); select(p, b); }
     });
-    $('[data-vis-open]').addEventListener('click', () => openProduct(active.id));
+    $('[data-vis-open]').addEventListener('click', () => active && openProduct(active.id));
     // ilk görünümde süpürme animasyonu
     room.split(92);
     const vio = new IntersectionObserver((en) => {
@@ -101,7 +101,7 @@
   /* ---------- Koleksiyon desen kutuları ---------- */
   $$('[data-coll-pattern]').forEach((el) => {
     const p = byId(el.dataset.collPattern);
-    if (p) applySwatch(el, p, 1.2);
+    if (p) applySwatch(el, p, p.photo ? 1 : 1.2);
   });
 
   /* ---------- Çok satanlar ---------- */
@@ -109,7 +109,7 @@
   if (car) {
     const best = PRODUCTS.filter((p) => p.badge === 'best');
     best.forEach((p) => car.appendChild(card(p)));
-    const stepW = () => car.firstElementChild.getBoundingClientRect().width + 24;
+    const stepW = () => (car.firstElementChild ? car.firstElementChild.getBoundingClientRect().width : 0) + 24;
     $('[data-car-prev]').addEventListener('click', () => car.scrollBy({ left: -stepW(), behavior: 'smooth' }));
     $('[data-car-next]').addEventListener('click', () => car.scrollBy({ left: stepW(), behavior: 'smooth' }));
   }
