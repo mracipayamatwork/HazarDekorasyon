@@ -1,6 +1,6 @@
 # Hazar Dekorasyon — Web Sitesi
 
-ASP.NET Core 9 (Razor Pages) + Entity Framework Core. Geliştirmede **SQLite**, yayında **SQL Server** kullanılacak şekilde hazırlanmıştır.
+ASP.NET Core 10 (Razor Pages) + Entity Framework Core. Geliştirmede **SQLite**, yayında **SQL Server** kullanılacak şekilde hazırlanmıştır.
 
 ## Özellikler
 
@@ -14,7 +14,7 @@ ASP.NET Core 9 (Razor Pages) + Entity Framework Core. Geliştirmede **SQLite**, 
 
 ## Kurulum ve çalıştırma
 
-Gereken: [.NET 9 SDK](https://dotnet.microsoft.com/download)
+Gereken: [.NET 10 SDK](https://dotnet.microsoft.com/download)
 
 1. Admin hesabı için yerel ayar dosyası oluşturun. Bu dosya git'e eklenmez:
 
